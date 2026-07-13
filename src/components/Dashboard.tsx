@@ -1,14 +1,115 @@
 "use client";
-import { useState } from "react";
-import type { AgentState, Critique, Draft, Event, Mode } from "@/lib/agent/types";
+import { useNewsletterStore } from "@/store/newsletter-store";
+import { StatusBadge } from "./StatusBadge";
+import GoalForm from "./GoalForm";
+import RunTimeline from "./RunTimeline";
+import CritiquePanel from "./CritiquePanel";
+import ApprovalCard from "./ApprovalCard";
+import NewsletterPreview from "./NewsletterPreview";
 
-const defaultGoal="Create a weekly newsletter on latest AI agent news and send it to our subscribers.";
-type View={runId?:string;events:Event[];status?:AgentState["status"];draft?:Draft;critique?:Critique;html?:string;output?:AgentState["output"];errors:string[];waiting:boolean};
-function merge(view:View, data:Partial<AgentState> & {events?:Event[]}) { return {...view,events:[...view.events,...(data.events||[])],status:data.status||view.status,draft:data.finalNewsletter||view.draft,critique:data.critique||view.critique,html:data.html||view.html,output:data.output||view.output,errors:[...view.errors,...(data.errors||[]).map(e=>e.message)]}; }
-async function consume(response:Response,on:(type:string,data:any)=>void){const reader=response.body?.getReader();if(!reader)throw new Error("Streaming response unavailable");const decoder=new TextDecoder();let buf="";while(true){const {done,value}=await reader.read();if(done)break;buf+=decoder.decode(value,{stream:true});const chunks=buf.split("\n\n");buf=chunks.pop()||"";for(const chunk of chunks){const event=chunk.match(/^event: (.+)$/m)?.[1];const raw=chunk.match(/^data: (.+)$/m)?.[1];if(event&&raw)on(event,JSON.parse(raw));}}}
-export default function Dashboard(){const[goal,setGoal]=useState(defaultGoal);const[mode,setMode]=useState<Mode>("autonomous");const[busy,setBusy]=useState(false);const[view,setView]=useState<View>({events:[],errors:[],waiting:false});
- const handle=(type:string,data:any)=>{if(type==="run")setView(v=>({...v,runId:data.runId}));else if(type==="update")setView(v=>merge(v,data));else if(type==="approval")setView(v=>({...v,waiting:true,status:"awaiting_approval"}));else if(type==="done")setView(v=>({...merge(v,data),waiting:false}));else if(type==="error")setView(v=>({...v,errors:[...v.errors,data.message],waiting:false}));};
- const run=async()=>{setBusy(true);setView({events:[],errors:[],waiting:false,status:"running"});try{const r=await fetch("/api/newsletter/run",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({goal,mode})});if(!r.ok)throw new Error("Unable to start agent");await consume(r,handle);}catch(e){setView(v=>({...v,errors:[...v.errors,e instanceof Error?e.message:"Run failed"]}));}finally{setBusy(false);}};
- const decide=async(approved:boolean)=>{if(!view.runId)return;setBusy(true);setView(v=>({...v,waiting:false}));try{const r=await fetch("/api/newsletter/resume",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({runId:view.runId,approved})});await consume(r,handle);}catch(e){setView(v=>({...v,errors:[...v.errors,e instanceof Error?e.message:"Resume failed"]}));}finally{setBusy(false);}};
- const download=()=>{if(!view.html||!view.draft)return;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([view.html],{type:"text/html"}));a.download="signalbrief-newsletter.html";a.click();URL.revokeObjectURL(a.href);};
- return <main><header><div><p className="eyebrow">LANGGRAPH OPERATIONS CONSOLE</p><h1>SignalBrief</h1><p className="sub">An observable, bounded agent that turns current AI-agent news into a grounded newsletter.</p></div><span className={`badge ${view.status||"idle"}`}>{view.status||"ready"}</span></header><section className="control card"><label>Newsletter goal<textarea value={goal} onChange={e=>setGoal(e.target.value)} disabled={busy}/></label><div className="actions"><div className="modes"><button className={mode==="autonomous"?"active":""} onClick={()=>setMode("autonomous")} disabled={busy}>Fully autonomous</button><button className={mode==="human"?"active":""} onClick={()=>setMode("human")} disabled={busy}>Human in the loop</button></div><button className="run" onClick={run} disabled={busy}>{busy?"Agent running…":"Run newsletter agent"}</button></div></section><section className="grid"><div className="card timeline"><div className="section-title"><h2>Execution timeline</h2><span>{view.events.length} events</span></div>{view.events.length===0?<p className="muted">Run the agent to inspect its LangGraph nodes, tools, critique, and output decision.</p>:<ol>{view.events.map(e=><li key={e.id}><span className={`dot ${e.status}`}/><div><strong>{e.label}</strong><p>{e.detail}</p><time>{new Date(e.at).toLocaleTimeString()}</time></div></li>)}</ol>}{view.errors.map((e,i)=><p className="error" key={i}>{e}</p>)}</div><div className="right">{view.critique&&<section className="card critique"><div className="section-title"><h2>Self-critique</h2><b>{view.critique.score}/100 · {view.critique.decision}</b></div><p><strong>Issues:</strong> {view.critique.issues.join(" · ")||"None"}</p>{view.critique.revisionInstructions.length>0&&<p><strong>Instructions:</strong> {view.critique.revisionInstructions.join(" · ")}</p>}</section>}{view.waiting&&view.draft&&<section className="card approval"><p className="eyebrow">LANGGRAPH INTERRUPT</p><h2>Approve simulated send?</h2><p>The graph is paused before the output side effect. Review the newsletter, then resume or cancel it.</p><div className="actions"><button className="reject" onClick={()=>decide(false)} disabled={busy}>Reject</button><button className="run" onClick={()=>decide(true)} disabled={busy}>Approve & resume</button></div></section>}{view.draft&&<section className="card preview"><div className="section-title"><div><p className="eyebrow">NEWSLETTER PREVIEW</p><h2>{view.draft.subject}</h2></div>{view.html&&<button onClick={download}>Download HTML</button>}</div><p className="muted">{view.draft.previewText}</p><p>{view.draft.intro}</p>{view.draft.items.map((x,i)=><article key={x.url}><span>{String(i+1).padStart(2,"0")}</span><div><a href={x.url} target="_blank" rel="noreferrer">{x.title}</a><p className="meta">{x.source} · {new Date(x.publishedAt).toLocaleDateString()} {x.evidenceType==="snippet"?"· snippet evidence":""}</p><p>{x.summary}</p><p><strong>Why it matters:</strong> {x.whyItMatters}</p></div></article>)}<p>{view.draft.closing}</p></section>}{view.output&&<section className="card success"><strong>Simulated send complete</strong><p>{view.output.subject} was simulated to {view.output.recipientCount.toLocaleString()} subscribers at {new Date(view.output.sentAt).toLocaleTimeString()}.</p></section>}</div></section></main>}
+export default function Dashboard() {
+  const {
+    goal,
+    mode,
+    busy,
+    view,
+    setGoal,
+    setMode,
+    run,
+    decide,
+    download,
+  } = useNewsletterStore();
+
+  return (
+    <div className="app-wrapper">
+      {/* ── App Header ─────────────────────────────────────── */}
+      <header className="app-header">
+        <div className="app-header-left">
+          <p className="app-eyebrow">LangGraph Operations Console</p>
+          <h1 className="app-title">SignalBrief</h1>
+          <p className="app-subtitle">
+            An observable, bounded LangGraph JS agent that turns current AI-agent
+            news into a grounded, critiqued newsletter.
+          </p>
+        </div>
+        <div className="app-header-right">
+          <StatusBadge status={view.status} />
+          <span style={{ fontSize: 11, color: "var(--text-3)" }}>
+            {view.events.length > 0
+              ? `${view.events.length} events logged`
+              : "No run active"}
+          </span>
+        </div>
+      </header>
+
+      {/* ── Goal Form ──────────────────────────────────────── */}
+      <GoalForm
+        goal={goal}
+        mode={mode}
+        busy={busy}
+        onGoalChange={setGoal}
+        onModeChange={setMode}
+        onRun={run}
+      />
+
+      {/* ── Main Two-Column Grid ───────────────────────────── */}
+      <div className="main-grid">
+        {/* Left: Execution Timeline */}
+        <div>
+          <RunTimeline events={view.events} errors={view.errors} />
+        </div>
+
+        {/* Right: Dynamic panels */}
+        <div className="right-col">
+          {/* Critique panel — shown once available */}
+          {view.critique && (
+            <CritiquePanel
+              critique={view.critique}
+              revised={view.revised}
+            />
+          )}
+
+          {/* HITL Approval card — shown when graph is interrupted */}
+          {view.awaiting && view.draft && (
+            <ApprovalCard
+              draft={view.draft}
+              critique={view.critique}
+              busy={busy}
+              onApprove={() => decide(true)}
+              onReject={() => decide(false)}
+            />
+          )}
+
+          {/* Newsletter preview — shown once draft is available */}
+          {view.draft && (
+            <NewsletterPreview
+              draft={view.draft}
+              html={view.html}
+              output={view.output}
+              onDownload={download}
+            />
+          )}
+
+          {/* Empty right column hint */}
+          {!view.critique && !view.draft && view.events.length === 0 && (
+            <div
+              className="card"
+              style={{
+                padding: "40px 32px",
+                textAlign: "center",
+                color: "var(--text-3)",
+                lineHeight: 1.7,
+              }}
+            >
+              <div style={{ fontSize: 36, marginBottom: 12 }}>🤖</div>
+              <p style={{ margin: 0, fontSize: 14 }}>
+                Critique analysis, newsletter preview, and HITL approval will
+                appear here as the agent progresses.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

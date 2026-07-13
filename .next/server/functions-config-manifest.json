@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "functions": {
+    "/api/newsletter/resume": {
+      "maxDuration": 60
+    },
+    "/api/newsletter/run": {
+      "maxDuration": 120
+    }
+  }
+}
