@@ -1,0 +1,20 @@
+import { z } from "zod";
+
+export const ModeSchema = z.enum(["autonomous", "human"]);
+export type Mode = z.infer<typeof ModeSchema>;
+export const SearchResultSchema = z.object({ title:z.string(), url:z.string().url(), source:z.string(), publishedAt:z.string(), snippet:z.string().default("") });
+export type SearchResult = z.infer<typeof SearchResultSchema>;
+export const ArticleSchema = SearchResultSchema.extend({ content:z.string(), evidenceType:z.enum(["article","snippet"]), fetchError:z.string().optional() });
+export type Article = z.infer<typeof ArticleSchema>;
+export const SummarySchema = z.object({ title:z.string(), url:z.string().url(), source:z.string(), publishedAt:z.string(), summary:z.string().min(20), whyItMatters:z.string().min(10), evidenceType:z.enum(["article","snippet"]) });
+export type Summary = z.infer<typeof SummarySchema>;
+export const PlanSchema = z.object({ topic:z.string(), audience:z.string(), angle:z.string(), queries:z.array(z.string()).min(2).max(3), articleTarget:z.number().int().min(5).max(7) });
+export type Plan = z.infer<typeof PlanSchema>;
+export const DraftSchema = z.object({ subject:z.string(), previewText:z.string(), intro:z.string(), items:z.array(SummarySchema).min(5).max(7), closing:z.string() });
+export type Draft = z.infer<typeof DraftSchema>;
+export const CritiqueSchema = z.object({ score:z.number().min(0).max(100), decision:z.enum(["pass","revise"]), issues:z.array(z.string()), revisionInstructions:z.array(z.string()) });
+export type Critique = z.infer<typeof CritiqueSchema>;
+export type Event = { id:string; at:string; node:string; label:string; status:"started"|"completed"|"warning"|"awaiting_approval"|"cancelled"; detail:string };
+export type AgentError = { node:string; message:string; recoverable:boolean };
+export type AgentState = { runId:string; goal:string; mode:Mode; status:"running"|"awaiting_approval"|"completed"|"cancelled"|"failed"; plan?:Plan; searchResults:SearchResult[]; selected:SearchResult[]; articles:Article[]; summaries:Summary[]; draft?:Draft; critique?:Critique; finalNewsletter?:Draft; html?:string; events:Event[]; errors:AgentError[]; retried:boolean; revised:boolean; output?:{ subject:string; recipientCount:number; sentAt:string; status:"simulated_sent" } };
+export const RunInputSchema = z.object({ goal:z.string().min(10).max(1000), mode:ModeSchema });

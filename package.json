@@ -1,0 +1,29 @@
+{
+  "name": "newsletter-agent",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "dev": "next dev", "build": "next build", "lint": "eslint", "test": "vitest", "test:run": "vitest run" },
+  "dependencies": {
+    "@langchain/core": "1.0.6",
+    "@langchain/google-genai": "^1.0.1",
+    "@langchain/langgraph": "^1.1.4",
+    "cheerio": "^1.1.2",
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "rss-parser": "^3.13.0",
+    "zod": "^3.24.2",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9.19.0",
+    "eslint-config-next": "^16.0.0",
+    "jsdom": "^26.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}
