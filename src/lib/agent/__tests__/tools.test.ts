@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { dedupeSources, renderNewsletter } from "../tools";
 import type { Draft, SearchResult } from "../types";
 
-// ─── dedupeSources ────────────────────────────────────────────────────────────
+// === dedupeSources ============================================================
 
 describe("dedupeSources", () => {
   const makeResult = (title: string, url: string): SearchResult => ({
@@ -50,7 +50,7 @@ describe("dedupeSources", () => {
   });
 });
 
-// ─── renderNewsletter ─────────────────────────────────────────────────────────
+// === renderNewsletter =========================================================
 
 const makeDraft = (): Draft => ({
   subject: "AI Agents Weekly",
@@ -121,7 +121,7 @@ describe("renderNewsletter", () => {
   });
 });
 
-// ─── Mock fetchArticle behaviour ──────────────────────────────────────────────
+// === Mock fetchArticle behaviour ==============================================
 
 describe("fetchArticle degradation", () => {
   it("returns snippet evidence when fetch fails and snippet is available", async () => {

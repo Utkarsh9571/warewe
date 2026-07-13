@@ -4,7 +4,7 @@ import * as cheerio from "cheerio";
 import { env } from "@/lib/env";
 import type { Article, Draft, SearchResult } from "./types";
 
-// ─── HTTP helpers ───────────────────────────────────────────────────────────
+// === HTTP helpers ===========================================================
 
 const timeoutFetch = async (url: string, ms = 10000) => {
   const controller = new AbortController();
@@ -25,7 +25,7 @@ const timeoutFetch = async (url: string, ms = 10000) => {
 
 const clean = (text: string) => text.replace(/\s+/g, " ").trim();
 
-// ─── Tool 1: News Search ─────────────────────────────────────────────────────
+// === Tool 1: News Search =====================================================
 
 export async function searchNews(query: string): Promise<SearchResult[]> {
   if (env.newsProvider === "newsapi" && env.newsKey) {
@@ -68,7 +68,7 @@ export async function searchNews(query: string): Promise<SearchResult[]> {
     }));
 }
 
-// ─── Deduplication ──────────────────────────────────────────────────────────
+// === Deduplication ==========================================================
 
 export function dedupeSources(results: SearchResult[]): SearchResult[] {
   const seen = new Set<string>();
@@ -80,7 +80,7 @@ export function dedupeSources(results: SearchResult[]): SearchResult[] {
   });
 }
 
-// ─── Tool 2: Article Fetch ──────────────────────────────────────────────────
+// === Tool 2: Article Fetch ==================================================
 
 export async function fetchArticle(source: SearchResult): Promise<Article> {
   try {
@@ -140,7 +140,7 @@ export async function fetchArticle(source: SearchResult): Promise<Article> {
   }
 }
 
-// ─── Tool 3: Newsletter Renderer ────────────────────────────────────────────
+// === Tool 3: Newsletter Renderer ============================================
 
 const esc = (v: string) =>
   v.replace(

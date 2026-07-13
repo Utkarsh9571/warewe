@@ -22,7 +22,7 @@ export default function Dashboard() {
 
   return (
     <div className="app-wrapper">
-      {/* ── App Header ─────────────────────────────────────── */}
+      {/* === App Header === */}
       <header className="app-header">
         <div className="app-header-left">
           <p className="app-eyebrow">LangGraph Operations Console</p>
@@ -42,7 +42,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* ── Goal Form ──────────────────────────────────────── */}
+      {/* === Goal Form === */}
       <GoalForm
         goal={goal}
         mode={mode}
@@ -52,7 +52,7 @@ export default function Dashboard() {
         onRun={run}
       />
 
-      {/* ── Main Two-Column Grid ───────────────────────────── */}
+      {/* === Main Two-Column Grid === */}
       <div className="main-grid">
         {/* Left: Execution Timeline */}
         <div>

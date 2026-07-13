@@ -8,7 +8,7 @@ export const maxDuration = 60;
 const encode = (event: string, data: unknown) =>
   `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 
-// ─── POST /api/newsletter/resume ──────────────────────────────────────────────
+// === POST /api/newsletter/resume ==============================================
 
 export async function POST(request: Request) {
   const json = await request.json().catch(() => null);

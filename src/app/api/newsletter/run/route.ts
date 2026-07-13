@@ -4,12 +4,12 @@ import { newsletterGraph } from "@/lib/agent/graph";
 export const runtime = "nodejs";
 export const maxDuration = 120; // 2-minute max for Vercel
 
-// ─── SSE helpers ─────────────────────────────────────────────────────────────
+// === SSE helpers =============================================================
 
 const encode = (event: string, data: unknown) =>
   `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 
-// ─── Stream graph execution ───────────────────────────────────────────────────
+// === Stream graph execution ===================================================
 
 function streamGraph(initialState: AgentState, runId: string) {
   const encoder = new TextEncoder();
@@ -70,7 +70,7 @@ function streamGraph(initialState: AgentState, runId: string) {
   });
 }
 
-// ─── POST /api/newsletter/run ─────────────────────────────────────────────────
+// === POST /api/newsletter/run =================================================
 
 export async function POST(request: Request) {
   const json = await request.json().catch(() => null);

@@ -41,7 +41,7 @@ const emptyView = (): RunView => ({
   revised: false,
 });
 
-// ─── SSE consumer ────────────────────────────────────────────────────────────
+// === SSE consumer ===
 
 async function consumeSSE(
   response: Response,
@@ -55,25 +55,41 @@ async function consumeSSE(
     const { done, value } = await reader.read();
     if (done) break;
     buf += decoder.decode(value, { stream: true });
-    const chunks = buf.split("\n\n");
+    // Split on either \n\n or \r\n\r\n (windows line endings)
+    const chunks = buf.split(/\r?\n\r?\n/);
     buf = chunks.pop() || "";
     for (const chunk of chunks) {
-      const type = chunk.match(/^event: (.+)$/m)?.[1];
-      const raw = chunk.match(/^data: (.+)$/m)?.[1];
-      if (type && raw) onEvent(type, JSON.parse(raw));
+      if (!chunk.trim()) continue;
+      const type = chunk.match(/^event: (.+)$/m)?.[1]?.trim();
+      const raw = chunk.match(/^data: (.+)$/m)?.[1]?.trim();
+      if (type && raw) {
+        try {
+          onEvent(type, JSON.parse(raw));
+        } catch (err) {
+          console.error("Failed to parse SSE event JSON:", err, "raw content:", raw);
+        }
+      }
     }
   }
 }
 
-// ─── State merge helper ───────────────────────────────────────────────────────
+// === State merge helper ===
 
 function applyUpdate(
   view: RunView,
   data: Record<string, any>
 ): RunView {
+  const combined = [...view.events, ...(data.events || [])];
+  const seen = new Set<string>();
+  const uniqueEvents = combined.filter((ev) => {
+    if (!ev || !ev.id || seen.has(ev.id)) return false;
+    seen.add(ev.id);
+    return true;
+  });
+
   return {
     ...view,
-    events: [...view.events, ...(data.events || [])],
+    events: uniqueEvents,
     status: (data.status as AgentStatus) || view.status,
     draft: data.finalNewsletter || view.draft,
     critique: data.critique || view.critique,
@@ -89,7 +105,7 @@ function applyUpdate(
   };
 }
 
-// ─── Store ────────────────────────────────────────────────────────────────────
+// === Store ===
 
 export const useNewsletterStore = create<NewsletterStore>((set, get) => ({
   goal: defaultGoal,

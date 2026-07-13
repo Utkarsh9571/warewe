@@ -22,7 +22,7 @@ import {
 import { dedupeSources, fetchArticle, renderNewsletter, searchNews } from "./tools";
 import { env } from "@/lib/env";
 
-// ─── Error helper ────────────────────────────────────────────────────────────
+// === Error helper ============================================================
 
 const makeError = (node: string, error: unknown) => ({
   errors: [
@@ -34,7 +34,7 @@ const makeError = (node: string, error: unknown) => ({
   ],
 });
 
-// ─── Node 1: Plan ────────────────────────────────────────────────────────────
+// === Node 1: Plan ============================================================
 
 export async function planNode(state: AgentState) {
   try {
@@ -59,7 +59,7 @@ export async function planNode(state: AgentState) {
   }
 }
 
-// ─── Node 2: Search ──────────────────────────────────────────────────────────
+// === Node 2: Search ==========================================================
 
 export async function searchNode(state: AgentState) {
   try {
@@ -104,7 +104,7 @@ export async function searchNode(state: AgentState) {
   }
 }
 
-// ─── Node 3: Select ──────────────────────────────────────────────────────────
+// === Node 3: Select ==========================================================
 
 export async function selectNode(state: AgentState) {
   try {
@@ -145,7 +145,7 @@ export async function selectNode(state: AgentState) {
   }
 }
 
-// ─── Node 4: Collect ─────────────────────────────────────────────────────────
+// === Node 4: Collect =========================================================
 
 export async function collectNode(state: AgentState) {
   const collected = await Promise.all(state.selected.map(fetchArticle));
@@ -166,7 +166,7 @@ export async function collectNode(state: AgentState) {
   };
 }
 
-// ─── Node 5: Summarize ───────────────────────────────────────────────────────
+// === Node 5: Summarize =======================================================
 
 export async function summarizeNode(state: AgentState) {
   try {
@@ -217,7 +217,7 @@ export async function summarizeNode(state: AgentState) {
   }
 }
 
-// ─── Node 6: Broaden (retry) ─────────────────────────────────────────────────
+// === Node 6: Broaden (retry) =================================================
 
 export async function broadenNode(state: AgentState) {
   const plan = {
@@ -243,7 +243,7 @@ export async function broadenNode(state: AgentState) {
   };
 }
 
-// ─── Node 7: Draft ───────────────────────────────────────────────────────────
+// === Node 7: Draft ===========================================================
 
 export async function draftNode(state: AgentState) {
   try {
@@ -272,7 +272,7 @@ export async function draftNode(state: AgentState) {
   }
 }
 
-// ─── Node 8: Critique ────────────────────────────────────────────────────────
+// === Node 8: Critique ========================================================
 
 export async function critiqueNode(state: AgentState) {
   try {
@@ -312,7 +312,7 @@ export async function critiqueNode(state: AgentState) {
   }
 }
 
-// ─── Node 9: Revise ──────────────────────────────────────────────────────────
+// === Node 9: Revise ==========================================================
 
 export async function reviseNode(state: AgentState) {
   try {
@@ -349,7 +349,7 @@ export async function reviseNode(state: AgentState) {
   }
 }
 
-// ─── Node 10: Approval (HITL checkpoint) ─────────────────────────────────────
+// === Node 10: Approval (HITL checkpoint) =====================================
 
 export function approvalNode(state: AgentState) {
   if (state.mode === "autonomous") {
@@ -399,7 +399,7 @@ export function approvalNode(state: AgentState) {
   };
 }
 
-// ─── Node 11: Send ───────────────────────────────────────────────────────────
+// === Node 11: Send ===========================================================
 
 export function sendNode(state: AgentState) {
   if (state.status === "cancelled") return {};

@@ -2,7 +2,7 @@
 import type { AgentEventStatus } from "@/lib/agent/types";
 import type { StoreStatus } from "@/store/newsletter-store";
 
-// ─── Status Badge ─────────────────────────────────────────────────────────────
+// === Status Badge ===
 
 interface StatusBadgeProps {
   status: StoreStatus;
@@ -25,7 +25,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   );
 }
 
-// ─── Timeline Dot ─────────────────────────────────────────────────────────────
+// === Timeline Dot ===
 
 interface TimelineDotProps {
   status: AgentEventStatus;

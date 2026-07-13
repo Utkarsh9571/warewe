@@ -7,7 +7,7 @@ import type {
   AgentState,
 } from "../types";
 
-// ─── Mocks ────────────────────────────────────────────────────────────────────
+// === Mocks ====================================================================
 
 // Mock LangGraph entirely to avoid ESM package exports mismatch
 vi.mock("@langchain/langgraph", () => {
@@ -88,7 +88,7 @@ vi.mock("@/lib/env", () => ({
   requireGeminiKey: () => "test-key",
 }));
 
-// ─── Test fixtures ────────────────────────────────────────────────────────────
+// === Test fixtures ============================================================
 
 const mockPlan: Plan = {
   topic: "AI Agents",
@@ -145,7 +145,7 @@ const makeBaseState = (): AgentState => ({
   revised: false,
 });
 
-// ─── planNode tests ───────────────────────────────────────────────────────────
+// === planNode tests ===========================================================
 
 describe("planNode", () => {
   beforeEach(() => {
@@ -180,7 +180,7 @@ describe("planNode", () => {
   });
 });
 
-// ─── critiqueNode tests ───────────────────────────────────────────────────────
+// === critiqueNode tests =======================================================
 
 describe("critiqueNode", () => {
   beforeEach(() => {
@@ -230,7 +230,7 @@ describe("critiqueNode", () => {
   });
 });
 
-// ─── approvalNode tests ───────────────────────────────────────────────────────
+// === approvalNode tests =======================================================
 
 describe("approvalNode", () => {
   it("bypasses approval and emits completed event in autonomous mode", async () => {
@@ -259,7 +259,7 @@ describe("approvalNode", () => {
   });
 });
 
-// ─── broadenNode tests ───────────────────────────────────────────────────────
+// === broadenNode tests =======================================================
 
 describe("broadenNode", () => {
   it("sets retried to true and expands queries", async () => {
@@ -274,7 +274,7 @@ describe("broadenNode", () => {
   });
 });
 
-// ─── sendNode tests ───────────────────────────────────────────────────────────
+// === sendNode tests ===========================================================
 
 describe("sendNode", () => {
   it("sets completed status, output metadata, and renders HTML", async () => {
@@ -305,7 +305,7 @@ describe("sendNode", () => {
   });
 });
 
-// ─── summarizeNode tests ──────────────────────────────────────────────────────
+// === summarizeNode tests ======================================================
 
 describe("summarizeNode", () => {
   beforeEach(() => {
