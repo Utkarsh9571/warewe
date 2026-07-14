@@ -188,7 +188,12 @@ export const useNewsletterStore = create<NewsletterStore>((set, get) => ({
       const response = await fetch("/api/newsletter/resume", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ runId: view.runId, approved }),
+        body: JSON.stringify({
+          runId: view.runId,
+          approved,
+          draft: view.draft,
+          critique: view.critique,
+        }),
       });
       if (!response.ok) throw new Error("Resume request failed");
       await consumeSSE(response, (type, data) => {
