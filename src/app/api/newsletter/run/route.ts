@@ -29,11 +29,13 @@ function streamGraph(initialState: AgentState, runId: string) {
           streamMode: "updates",
         });
 
+        let hasAwaitingApproval = false;
         for await (const update of iterable as AsyncIterable<
           Record<string, Partial<AgentState> | unknown>
         >) {
           // HITL interrupt signal
           if ("__interrupt__" in update) {
+            hasAwaitingApproval = true;
             send("approval", (update as { __interrupt__: unknown }).__interrupt__);
             continue;
           }
@@ -57,7 +59,11 @@ function streamGraph(initialState: AgentState, runId: string) {
 
         // Final state snapshot
         const final = await newsletterGraph.getState(config);
-        send("done", final.values);
+        const values = { ...final.values };
+        if (hasAwaitingApproval) {
+          values.status = "awaiting_approval";
+        }
+        send("done", values);
       } catch (error) {
         send("error", {
           message:
