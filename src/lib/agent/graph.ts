@@ -51,7 +51,17 @@ const graph = new StateGraph(AgentAnnotation)
   )
   .addEdge("send_node", END);
 
-export const checkpointer = new MemorySaver();
+// Setup a global singleton checkpointer to prevent Next.js from creating
+// separate instances in different API route bundles or during hot reloading.
+const globalForAgent = globalThis as unknown as {
+  checkpointer?: MemorySaver;
+};
+
+export const checkpointer = globalForAgent.checkpointer ?? new MemorySaver();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForAgent.checkpointer = checkpointer;
+}
 
 // The graph uses interrupt() inside approvalNode for human mode.
 // The MemorySaver checkpointer enables state persistence across the interrupt.
