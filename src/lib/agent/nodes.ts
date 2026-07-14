@@ -38,7 +38,8 @@ const makeError = (node: string, error: unknown) => ({
 
 export async function planNode(state: AgentState) {
   try {
-    const plan = await structured(PlanSchema, planPrompt(state.goal));
+    const currentDateUtc = new Date().toISOString();
+    const plan = await structured(PlanSchema, planPrompt(state.goal, currentDateUtc));
     return {
       plan,
       events: [
@@ -237,7 +238,7 @@ export async function broadenNode(state: AgentState) {
   const plan = {
     ...(state.plan!),
     queries: [
-      "AI agents product launch enterprise research 2024 2025",
+      "AI agents product launch enterprise research",
       "autonomous AI system industry news applications",
       "LLM agent framework announcement",
     ],
@@ -290,9 +291,10 @@ export async function draftNode(state: AgentState) {
 
 export async function critiqueNode(state: AgentState) {
   try {
+    const currentDateUtc = new Date().toISOString();
     const critique = await structured(
       CritiqueSchema,
-      critiquePrompt(JSON.stringify(state.draft))
+      critiquePrompt(JSON.stringify(state.draft), currentDateUtc)
     );
     return {
       critique,

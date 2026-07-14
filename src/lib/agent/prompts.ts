@@ -4,13 +4,16 @@ Never invent facts, dates, quotes, publishers, or URLs. \
 Write concise, practical copy for technology professionals. \
 Always comply with the JSON schema exactly.`;
 
-export const planPrompt = (goal: string) => `${SYSTEM}
+export const planPrompt = (goal: string, currentDateUtc: string) => `${SYSTEM}
 
 Create a structured research plan for this newsletter goal:
 "${goal}"
 
-Focus on recent AI agent news and developments. Produce 2-3 diverse search queries that will surface different angles of the topic. \
-Choose a target of 5-7 articles and create a compelling editorial angle. Return valid JSON matching the schema.`;
+Today's date is: ${currentDateUtc}.
+Requirements:
+- Design search queries to find recent developments from the last 7-14 days relative to today.
+- Do NOT generate stale year-specific queries (such as queries containing "2024" or other past years) unless the user goal explicitly requests a historical period.
+- Produce 2-3 diverse search queries that will surface different angles of the topic. Choose a target of 5-7 articles and create a compelling editorial angle. Return valid JSON matching the schema.`;
 
 export const selectionPrompt = (sources: string) => `${SYSTEM}
 
@@ -47,13 +50,16 @@ Draft a clean, professional weekly newsletter from the supplied summaries. Requi
 SUMMARIES:
 ${summaries}`;
 
-export const critiquePrompt = (draft: string) => `${SYSTEM}
+export const critiquePrompt = (draft: string, currentDateUtc: string) => `${SYSTEM}
 
-Critically evaluate this newsletter draft. Check ALL of the following:
+Critically evaluate this newsletter draft. Today's date is: ${currentDateUtc}.
+Use this supplied current date as the only temporal reference. Never assume another current date.
+
+Check ALL of the following:
 1. Article count (must be 5-7)
 2. All URLs are real and from the source data (not fabricated)
 3. No duplicated stories or sources
-4. Recency (prefer articles from last 7-14 days)
+4. Recency (prefer articles from the previous 7-14 days relative to today; identify stale sources that are older than 14 days separately from future-dated sources, and identify genuinely future-dated sources that are dated after today)
 5. Scanability and clear editorial value
 6. Unsupported claims not in article content
 7. Subject line quality and accuracy

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type {
   Plan,
   Summary,
@@ -150,6 +150,12 @@ const makeBaseState = (): AgentState => ({
 describe("planNode", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-14T12:00:00.000Z"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("returns a plan and completed event on success", async () => {
@@ -164,6 +170,10 @@ describe("planNode", () => {
     expect(result.events[0].status).toBe("completed");
     expect(result.events[0].node).toBe("plan");
     expect(result.events[0].detail).toContain("AI Agents");
+    expect(structured).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining("2026-07-14T12:00:00.000Z")
+    );
   });
 
   it("returns failed status and warning event on LLM error", async () => {
@@ -185,6 +195,12 @@ describe("planNode", () => {
 describe("critiqueNode", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-14T12:00:00.000Z"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("returns pass critique with score in event detail", async () => {
@@ -200,6 +216,10 @@ describe("critiqueNode", () => {
     expect(result.events[0].detail).toContain("90/100");
     expect(result.events[0].detail).toContain("PASS");
     expect(result.events[0].status).toBe("completed");
+    expect(structured).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.stringContaining("2026-07-14T12:00:00.000Z")
+    );
   });
 
   it("returns revise critique with issues listed", async () => {
@@ -271,6 +291,10 @@ describe("broadenNode", () => {
     expect(result.plan?.queries.length).toBeGreaterThanOrEqual(2);
     expect(result.events[0].node).toBe("broaden");
     expect(result.events[0].status).toBe("completed");
+
+    // Verify broadenNode contains no hardcoded historical years
+    const hasHistoricalYear = result.plan?.queries.some((q) => /\b(19|20)\d{2}\b/.test(q));
+    expect(hasHistoricalYear).toBe(false);
   });
 });
 
@@ -329,5 +353,30 @@ describe("summarizeNode", () => {
     expect(result.events[0].status).toBe("warning");
     // The message will say "Only 2 usable sources"
     expect(result.events[0].detail).toContain("Only 2");
+  });
+});
+
+// === Prompt Temporal Grounding tests ==========================================
+
+describe("planning and critique prompts", () => {
+  it("planning prompt includes the supplied current date", async () => {
+    const { planPrompt } = await import("../prompts");
+    const goal = "Create a newsletter on AI agents";
+    const date = "2026-07-14T12:00:00Z";
+    const prompt = planPrompt(goal, date);
+    expect(prompt).toContain(date);
+    expect(prompt).toContain("last 7-14 days");
+    expect(prompt).toContain("Do NOT generate stale year-specific queries");
+  });
+
+  it("critique prompt includes the supplied current date and distinguishes stale from future-dated sources", async () => {
+    const { critiquePrompt } = await import("../prompts");
+    const draft = "draft contents here";
+    const date = "2026-07-14T12:00:00Z";
+    const prompt = critiquePrompt(draft, date);
+    expect(prompt).toContain(date);
+    expect(prompt).toContain("only temporal reference");
+    expect(prompt).toContain("identify stale sources");
+    expect(prompt).toContain("identify genuinely future-dated sources");
   });
 });
