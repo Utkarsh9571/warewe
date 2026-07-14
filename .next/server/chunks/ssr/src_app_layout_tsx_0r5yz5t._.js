@@ -1,3 +1,0 @@
-module.exports=[27572,a=>{"use strict";var b=a.i(82329);a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"en",children:(0,b.jsx)("body",{children:a})})},"metadata",0,{title:"SignalBrief – AI Newsletter Agent",description:"An observable, bounded LangGraph JS agent that autonomously researches, summarizes, critiques, and delivers an AI-agent news newsletter. Supports Fully Autonomous and Human-in-the-Loop modes.",keywords:["LangGraph","AI agent","newsletter","autonomous","HITL"]}])},50645,a=>{a.n(a.i(27572))}];
-
-//# sourceMappingURL=src_app_layout_tsx_0r5yz5t._.js.map
