@@ -17,7 +17,7 @@ export const selectionPrompt = (sources: string) => `${SYSTEM}
 Select up to 9 of the strongest candidates from these search results. \
 Prioritize: AI-agent relevance, recency (newer = better), source diversity, and substantive snippets that suggest real article content. \
 Discard duplicates and weak/unrelated results. \
-Return an array of URLs only (JSON array of strings).
+Return an array of source IDs only (JSON array of strings, e.g. ["source_0", "source_1"]).
 
 SOURCES:
 ${sources}`;

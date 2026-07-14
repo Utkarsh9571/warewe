@@ -12,8 +12,8 @@ importers:
         specifier: 1.2.2
         version: 1.2.2(ws@8.21.0)
       '@langchain/google-genai':
-        specifier: ^1.0.1
-        version: 1.0.3(@langchain/core@1.2.2(ws@8.21.0))
+        specifier: ^2.2.0
+        version: 2.2.0(@langchain/core@1.2.2(ws@8.21.0))
       '@langchain/langgraph':
         specifier: ^1.1.4
         version: 1.4.7(@langchain/core@1.2.2(ws@8.21.0))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@3.25.76)
@@ -589,11 +589,11 @@ packages:
     resolution: {integrity: sha512-KfjEOT6sCg0vvItagfEtGpmrGoLMGfma4Affb5BGEqPmS2YR3AxW54pABSkhQlzCehTB+0BnLquAe1lGF4J9zQ==}
     engines: {node: '>=20'}
 
-  '@langchain/google-genai@1.0.3':
-    resolution: {integrity: sha512-ZN3f6SPFZI3FMjJ1C0y5A/lWlZ/x+A9RoIKg1PNYdX6bEu7/BR7oz0dYYI2+YGl3TRp1u75e3SzzL0MxmfWfDA==}
+  '@langchain/google-genai@2.2.0':
+    resolution: {integrity: sha512-1mDqbmB6+iC6ZBQY15r5xJg9wPErnQ774inpKh6qi6BrrjadDwaPHoklJW5IXU94edKiDpm1akIzJCrQDWe6yA==}
     engines: {node: '>=20'}
     peerDependencies:
-      '@langchain/core': 1.0.6
+      '@langchain/core': ^1.2.0
 
   '@langchain/langgraph-checkpoint@1.1.3':
     resolution: {integrity: sha512-wgzdQNeEsdw1e+4lvlj0tdq/RYR/k1vPin10g0ymGoehZDDgd9nvIllGXSXN4TFgF9sf5qQP/KTkOcLfeseIhA==}
@@ -2539,10 +2539,6 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
-  uuid@11.1.1:
-    resolution: {integrity: sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==}
-    hasBin: true
-
   vite-node@3.2.4:
     resolution: {integrity: sha512-EbKSKh+bh1E1IFxeO0pg1n4dvoOTt0UDiXMd/qn++r98+jPO1xtJilvXldeuQ8giIB5IkpjCgMleHMNEsGH6pg==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -3167,11 +3163,10 @@ snapshots:
       - openai
       - ws
 
-  '@langchain/google-genai@1.0.3(@langchain/core@1.2.2(ws@8.21.0))':
+  '@langchain/google-genai@2.2.0(@langchain/core@1.2.2(ws@8.21.0))':
     dependencies:
       '@google/generative-ai': 0.24.1
       '@langchain/core': 1.2.2(ws@8.21.0)
-      uuid: 11.1.1
 
   '@langchain/langgraph-checkpoint@1.1.3(@langchain/core@1.2.2(ws@8.21.0))':
     dependencies:
@@ -5376,8 +5371,6 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
-
-  uuid@11.1.1: {}
 
   vite-node@3.2.4(@types/node@22.20.1):
     dependencies:

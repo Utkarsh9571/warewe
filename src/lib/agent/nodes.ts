@@ -109,13 +109,27 @@ export async function searchNode(state: AgentState) {
 export async function selectNode(state: AgentState) {
   try {
     const candidates = state.searchResults.slice(0, 30);
-    const urls = await structured(
-      z.array(z.string().url()).min(1).max(9),
-      selectionPrompt(JSON.stringify(candidates))
+    // Assign simple source IDs to prevent URL base64 token output limit truncation
+    const mappedCandidates = candidates.map((c, i) => ({
+      id: `source_${i}`,
+      title: c.title,
+      source: c.source,
+      publishedAt: c.publishedAt,
+      snippet: c.snippet,
+    }));
+
+    const selectedIds = await structured(
+      z.array(z.string()).min(1).max(9),
+      selectionPrompt(JSON.stringify(mappedCandidates))
     );
-    const picked = urls
-      .map((u) => candidates.find((c) => c.url === u))
+
+    const picked = selectedIds
+      .map((id) => {
+        const idx = parseInt(id.replace("source_", ""), 10);
+        return candidates[idx];
+      })
       .filter(Boolean) as SearchResult[];
+
     const selected = picked.length ? picked : candidates.slice(0, 9);
     return {
       selected,
