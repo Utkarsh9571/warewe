@@ -148,7 +148,11 @@ export const useNewsletterStore = create<NewsletterStore>((set, get) => ({
             },
           }));
         } else if (type === "done") {
-          set((s) => ({ view: { ...applyUpdate(s.view, d), awaiting: false } }));
+          set((s) => {
+            const nextView = applyUpdate(s.view, d);
+            const stillAwaiting = nextView.status === "awaiting_approval";
+            return { view: { ...nextView, awaiting: stillAwaiting } };
+          });
         } else if (type === "error") {
           set((s) => ({
             view: {
@@ -192,7 +196,11 @@ export const useNewsletterStore = create<NewsletterStore>((set, get) => ({
         if (type === "update") {
           set((s) => ({ view: applyUpdate(s.view, d) }));
         } else if (type === "done") {
-          set((s) => ({ view: { ...applyUpdate(s.view, d), awaiting: false } }));
+          set((s) => {
+            const nextView = applyUpdate(s.view, d);
+            const stillAwaiting = nextView.status === "awaiting_approval";
+            return { view: { ...nextView, awaiting: stillAwaiting } };
+          });
         } else if (type === "error") {
           set((s) => ({
             view: {
