@@ -2,7 +2,7 @@ import "server-only";
 
 export const env = {
   geminiKey: process.env.GEMINI_API_KEY,
-  geminiModel: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  geminiModel: process.env.GEMINI_MODEL || "gemini-3.5-flash",
   newsKey: process.env.NEWS_API_KEY,
   newsProvider: (process.env.NEWS_PROVIDER || "rss") as "newsapi" | "rss",
   recipients: Number(process.env.NEXT_PUBLIC_SIMULATED_RECIPIENT_COUNT || 1248),

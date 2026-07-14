@@ -76,7 +76,7 @@ export default function NewsletterPreview({
 
         <div className="preview-items">
           {draft.items.map((item, i) => (
-            <div key={item.url} className="preview-item">
+            <div key={`${item.url}-${i}`} className="preview-item">
               <span className="preview-item-num">
                 {String(i + 1).padStart(2, "0")}
               </span>
